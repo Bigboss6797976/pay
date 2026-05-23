@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1677FF">
+  <meta name="description" content="聚合支付一码多付，支持支付宝/微信自动识别">
+  <title>聚合收款 - 一码多付</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/images/icon-192.png">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">💰 聚合收款</div>
+      <p class="subtitle">一码多付 · 智能识别 · 安全便捷</p>
+    </header>
+    <main class="pay-main landing-page">
+      <div class="landing-logo">💳</div>
+      <h1 class="landing-title">聚合支付收款</h1>
+      <p class="landing-desc">同一个二维码，自动识别支付宝或微信</p>
+      <div class="demo-card animate-in">
+        <h3>📝 创建收款</h3>
+        <form id="pay-form">
+          <div class="input-group">
+            <label>收款金额（元）</label>
+            <input type="number" id="amount" placeholder="0.00" step="0.01" min="0.01" required value="9.99">
+          </div>
+          <div class="input-group">
+            <label>商品描述</label>
+            <input type="text" id="subject" placeholder="请输入商品名称" value="测试商品" required>
+          </div>
+          <button type="submit" class="pay-btn"><span>🔵</span><span>生成聚合收款码</span></button>
+        </form>
+      </div>
+      <div class="features">
+        <div class="feature-item"><div class="feature-icon">🔵</div><div class="feature-title">支付宝</div><div class="feature-desc">自动跳转支付宝</div></div>
+        <div class="feature-item"><div class="feature-icon">🟢</div><div class="feature-title">微信支付</div><div class="feature-desc">自动跳转微信</div></div>
+        <div class="feature-item"><div class="feature-icon">📱</div><div class="feature-title">手机端优化</div><div class="feature-desc">完美适配移动端</div></div>
+        <div class="feature-item"><div class="feature-icon">💻</div><div class="feature-title">电脑端支持</div><div class="feature-desc">桌面端同样流畅</div></div>
+      </div>
+    </main>
+    <footer class="app-footer"><p>🔒 安全支付 · 聚合收款提供技术支持</p><p class="order-id">v1.0.0</p></footer>
+  </div>
+  <script src="/js/app.js"></script>
+</body>
+</html>
