@@ -1,11 +1,11 @@
 {
   "name": "pay-agg-demo",
   "version": "1.0.0",
-  "description": "聚合支付一码多付 - 支持支付宝/微信自动识别",
+  "description": "聚合支付一码多付",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
