@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🌿 能量码生成器 | 支付宝·绿色能量主题</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body {
+            background: linear-gradient(145deg, #d4fc79 0%, #96e6a1 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(255,255,240,0.96);
+            border-radius: 56px 56px 44px 44px;
+            box-shadow: 0 25px 45px rgba(0,32,0,0.3);
+            overflow: hidden;
+        }
+        .hero {
+            background: #2c5e2e;
+            padding: 16px 20px 10px;
+            text-align: center;
+            color: #f9f3cf;
+            border-bottom: 3px solid #ffeeaa;
+        }
+        .hero h1 {
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            font-weight: 800;
+            text-shadow: 2px 2px 0 #1e3a1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .hero .badge {
+            background: #ffdd77;
+            color: #1f4f1f;
+            border-radius: 60px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 6px;
+        }
+        .preview-area {
+            padding: 24px 16px 16px;
+            background: #fef9e6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvas-wrapper {
+            background: white;
+            border-radius: 44px;
+            padding: 12px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 28px;
+            box-shadow: 0 0 0 4px #f9eec1, 0 6px 16px rgba(0,0,0,0.1);
+            width: 100%;
+            height: auto;
+            background: white;
+        }
+        .tip {
+            font-size: 0.7rem;
+            background: #e9f7e1;
+            padding: 5px 12px;
+            border-radius: 60px;
+            color: #2b6e2b;
+        }
+        .control-panel {
+            padding: 8px 20px 28px;
+            background: #ffffffea;
+            border-radius: 44px 44px 0 0;
+        }
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #1b4d1b;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #b7dc9c;
+            border-radius: 48px;
+            font-size: 0.85rem;
+            background: #fffff2;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #3a9b3a;
+            box-shadow: 0 0 0 2px rgba(58,155,58,0.2);
+        }
+        .input-group .help {
+            font-size: 0.65rem;
+            color: #5e8b5e;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 16px 0 12px;
+        }
+        .btn {
+            flex: 1;
+            background: #3c8c3c;
+            border: none;
+            padding: 10px 0;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .btn-secondary { background: #5fa05f; }
+        .btn-download { background: #1f6e2f; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .footer-note {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #5f7e4a;
+            border-top: 1px dashed #ccddbb;
+            padding-top: 14px;
+            margin-top: 8px;
+        }
+        .energy-badge {
+            background: #eef5e2;
+            border-radius: 40px;
+            padding: 5px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #266b26;
+        }
+        @media (max-width: 550px) {
+            .container { border-radius: 40px; }
+            .btn-group { gap: 8px; }
+            .btn { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1><span>🌱</span> 能量码生成器 <span>💚</span></h1>
+        <div class="badge">⚡ 一码多付 · 智能美化 · 即时可用 ⚡</div>
+    </div>
+    <div class="preview-area">
+        <div class="canvas-wrapper">
+            <canvas id="energyCanvas" width="500" height="500" style="width:100%; height:auto; max-width:500px; aspect-ratio:1/1"></canvas>
+        </div>
+        <div class="tip">✨ 实时预览 | 支持支付宝/微信/任意链接</div>
+    </div>
+    <div class="control-panel">
+        <div class="input-group">
+            <label>📱 收款码链接 / 任意文本</label>
+            <input type="text" id="paymentLink" placeholder="例如：https://qr.alipay.com/xxx" value="https://qr.alipay.com/fkx1234567890demo">
+            <div class="help">🔹 替换成你自己的支付宝/微信收款码链接，扫码即支付</div>
+        </div>
+        <div class="input-group">
+            <label>🏷️ 商家/昵称（可选）</label>
+            <input type="text" id="merchantName" placeholder="昵称" value="JOHN">
+            <div class="help">显示在二维码上方</div>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="refreshBtn">🔄 生成能量码</button>
+            <button class="btn btn-download" id="downloadPNG">📥 下载 PNG</button>
+            <button class="btn btn-secondary" id="downloadJPG">📸 下载 JPG</button>
+        </div>
+        <div class="footer-note">
+            <div class="energy-badge">💚 支 支付宝 💚  推荐使用支付宝 · 支付得蚂蚁森林能量</div>
+            <div style="margin-top:10px;">⚡ 多人同时使用 | 每人独立生成 | 一码通用 ⚡</div>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        const canvas = document.getElementById('energyCanvas');
+        const ctx = canvas.getContext('2d');
+        const paymentInput = document.getElementById('paymentLink');
+        const merchantInput = document.getElementById('merchantName');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const downloadPNG = document.getElementById('downloadPNG');
+        const downloadJPG = document.getElementById('downloadJPG');
+        const SIZE = 500;
+        canvas.width = SIZE;
+        canvas.height = SIZE;
+        let qrCodeSize = 280;
+        let qrCodeX = (SIZE - qrCodeSize) / 2;
+        let qrCodeY = 125;
+        let currentQRImage = null;
+
+        function generateQRImage(text, size) {
+            return new Promise((resolve, reject) => {
+                if (!text || text.trim() === "") {
+                    reject(new Error("内容不能为空"));
+                    return;
+                }
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.top = '-9999px';
+                tempDiv.style.left = '-9999px';
+                document.body.appendChild(tempDiv);
+                try {
+                    const qr = new QRCode(tempDiv, {
+                        text: text,
+                        width: size,
+                        height: size,
+                        colorDark: "#1a3a1a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    let qrCanvas = tempDiv.querySelector('canvas');
+                    if (!qrCanvas) {
+                        const img = tempDiv.querySelector('img');
+                        if(img) {
+                            const offCanvas = document.createElement('canvas');
+                            offCanvas.width = size;
+                            offCanvas.height = size;
+                            const offCtx = offCanvas.getContext('2d');
+                            offCtx.drawImage(img, 0, 0, size, size);
+                            qrCanvas = offCanvas;
+                        } else {
+                            throw new Error("二维码生成失败");
+                        }
+                    }
+                    const imgObj = new Image();
+                    imgObj.onload = () => {
+                        document.body.removeChild(tempDiv);
+                        resolve(imgObj);
+                    };
+                    imgObj.onerror = () => {
+                        document.body.removeChild(tempDiv);
+                        reject(new Error("二维码图像渲染失败"));
+                    };
+                    imgObj.src = qrCanvas.toDataURL('image/png');
+                } catch (err) {
+                    document.body.removeChild(tempDiv);
+                    reject(err);
+                }
+            });
+        }
+
+        async function drawEnergyCode() {
+            let qrText = paymentInput.value.trim();
+            if (!qrText) {
+                qrText = "https://qr.alipay.com/fallback";
+                paymentInput.value = qrText;
+            }
+            const merchant = merchantInput.value.trim() || "昵称";
+            ctx.clearRect(0, 0, SIZE, SIZE);
+            ctx.fillStyle = "#eef5e2";
+            ctx.fillRect(0, 0, SIZE, SIZE);
+            ctx.font = "bold 20px 'Segoe UI'";
+            ctx.fillStyle = "#2c6e2c";
+            ctx.fillText("⚡ 生成中...", 180, 250);
+            try {
+                const qrImg = await generateQRImage(qrText, 280);
+                currentQRImage = qrImg;
+                drawFullEnergyDesign(qrImg, merchant, qrText);
+            } catch (err) {
+                console.error(err);
+                ctx.clearRect(0, 0, SIZE, SIZE);
+                ctx.fillStyle = "#ffe1c4";
+                ctx.fillRect(0, 0, SIZE, SIZE);
+                ctx.fillStyle = "#b33";
+                ctx.font = "18px system-ui";
+                ctx.fillText("⚠️ 链接无效，请重新输入", 120, 250);
+                ctx.font = "14px system-ui";
+                ctx.fillStyle = "#486848";
+                ctx.fillText("支持支付宝/微信收款链接", 150, 320);
+            }
+        }
+
+        function drawFullEnergyDesign(qrImage, merchantName, linkBrief) {
+            ctx.clearRect(0, 0, SIZE, SIZE);
+            const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
+            grad.addColorStop(0, '#c3e8a7');
+            grad.addColorStop(1, '#82c46a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, SIZE, SIZE);
+            for (let i = 0; i < 70; i++) {
+                ctx.beginPath();
+                let x = (i * 131) % SIZE;
+                let y = (i * 253) % SIZE;
+                let r = 2 + (i % 5);
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 245, 150, ${0.2 + (i % 3) * 0.1})`;
+                ctx.fill();
+            }
+            ctx.shadowColor = "rgba(0,0,0,0.08)";
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = "#fffff6";
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.beginPath();
+            ctx.roundRect(18, 18, SIZE - 36, SIZE - 36, 36);
+            ctx.fill();
+            ctx.shadowColor = "transparent";
+            ctx.font = "bold 38px 'KaiTi','PingFang SC'";
+            ctx.fillStyle = "#1d6b2b";
+            ctx.fillText("支", 45, 85);
+            ctx.font = "bold 32px system-ui";
+            ctx.fillStyle = "#0f5225";
+            ctx.fillText("支付宝", 110, 82);
+            ctx.font = "500 18px system-ui";
+            ctx.fillStyle = "#d68b2c";
+            ctx.fillText("推荐使用支付宝", SIZE - 190, 72);
+            const energyText = "绿色能量";
+            const energyFont = "bold 20px 'KaiTi','PingFang SC'";
+            ctx.font = energyFont;
+            ctx.fillStyle = "#3c8c2f";
+            ctx.fillText(energyText, qrCodeX - 50, qrCodeY + 35);
+            ctx.fillText(energyText, qrCodeX + qrCodeSize + 10, qrCodeY + 35);
+            ctx.fillText(energyText, qrCodeX - 50, qrCodeY + qrCodeSize - 10);
+            ctx.fillText(energyText, qrCodeX + qrCodeSize + 10, qrCodeY + qrCodeSize - 10);
+            ctx.fillStyle = "#5cb85c";
+            for (let corner of [[qrCodeX-12, qrCodeY-12], [qrCodeX+qrCodeSize-8, qrCodeY-12], [qrCodeX-12, qrCodeY+qrCodeSize-12], [qrCodeX+qrCodeSize-8, qrCodeY+qrCodeSize-12]]) {
+                ctx.beginPath();
+                ctx.moveTo(corner[0], corner[1]+6);
+                ctx.quadraticCurveTo(corner[0]+4, corner[1]-2, corner[0]+12, corner[1]+4);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(corner[0]+6, corner[1]);
+                ctx.quadraticCurveTo(corner[0]+12, corner[1]-4, corner[0]+14, corner[1]+6);
+                ctx.fill();
+            }
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.drawImage(qrImage, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
+            ctx.shadowBlur = 0;
+            ctx.font = "600 20px 'Segoe UI'";
+            ctx.fillStyle = "#2b5e2b";
+            ctx.fillText(`${merchantName}`, qrCodeX + qrCodeSize/2 - ctx.measureText(merchantName).width/2, qrCodeY - 12);
+            ctx.font = "500 18px system-ui";
+            ctx.fillStyle = "#2a6333";
+            ctx.fillText("打开支付宝[扫一扫]", qrCodeX + 45, qrCodeY + qrCodeSize + 38);
+            ctx.font = "bold 19px system-ui";
+            ctx.fillStyle = "#b45f1b";
+            ctx.fillText("支付得蚂蚁森林能量", qrCodeX + 55, qrCodeY + qrCodeSize + 68);
+            ctx.fillStyle = "#509e2c";
+            ctx.beginPath();
+            ctx.roundRect(40, SIZE - 52, SIZE - 80, 28, 30);
+            ctx.fill();
+            ctx.fillStyle = "#fff1b0";
+            ctx.font = "bold 13px system-ui";
+            ctx.fillText("💚 绿色能量 · 一码多付 💚", SIZE/2-100, SIZE-33);
+            let shortLink = linkBrief.length > 26 ? linkBrief.substring(0, 23)+"..." : linkBrief;
+            ctx.font = "10px monospace";
+            ctx.fillStyle = "#657f4b";
+            ctx.fillText(`收款码: ${shortLink}`, 35, SIZE-16);
+        }
+        
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x+r, y);
+                this.lineTo(x+w-r, y);
+                this.quadraticCurveTo(x+w, y, x+w, y+r);
+                this.lineTo(x+w, y+h-r);
+                this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+                this.lineTo(x+r, y+h);
+                this.quadraticCurveTo(x, y+h, x, y+h-r);
+                this.lineTo(x, y+r);
+                this.quadraticCurveTo(x, y, x+r, y);
+                return this;
+            };
+        }
+        
+        function downloadImage(type = 'png') {
+            if (!currentQRImage && paymentInput.value) {
+                drawEnergyCode().then(() => {
+                    setTimeout(() => triggerDownload(type), 100);
+                }).catch(() => alert("请填写有效链接后重试"));
+                return;
+            } else if (!currentQRImage && !paymentInput.value) {
+                alert("请填写支付宝/微信收款链接");
+                return;
+            }
+            triggerDownload(type);
+        }
+        
+        function triggerDownload(type) {
+            try {
+                const mimeType = type === 'png' ? 'image/png' : 'image/jpeg';
+                const extension = type === 'png' ? 'png' : 'jpg';
+                const link = document.createElement('a');
+                link.download = `energy_code_${Date.now()}.${extension}`;
+                link.href = canvas.toDataURL(mimeType, 0.95);
+                link.click();
+            } catch(e) {
+                alert("导出失败，可刷新页面重试");
+            }
+        }
+        
+        let debounceTimer;
+        function autoRefresh() {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => { drawEnergyCode(); }, 300);
+        }
+        
+        paymentInput.addEventListener('input', autoRefresh);
+        merchantInput.addEventListener('input', autoRefresh);
+        refreshBtn.addEventListener('click', () => { drawEnergyCode(); });
+        downloadPNG.addEventListener('click', () => downloadImage('png'));
+        downloadJPG.addEventListener('click', () => downloadImage('jpeg'));
+        drawEnergyCode().catch(console.warn);
+        canvas.addEventListener('touchstart', (e) => e.preventDefault());
+    })();
+</script>
+</body>
+</html>
